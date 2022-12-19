@@ -1,36 +1,74 @@
 import { legacy_createStore as createStore } from "redux";
 
-const plus = document.getElementById("add");
-const minus = document.getElementById("minus");
-const number = document.querySelector("span");
+const form = document.querySelector("form");
+const input = document.querySelector("input");
+const ul = document.querySelector("ul");
 
-// Reducer는 여기서 State와 액션에 따른 행동을 정의
-const countModifier = (count = 0, action) => {
-  if (action.type === "ADD") {
-    return count + 1;
-  } else if (action.type === "MINUS") {
-    return count - 1;
+
+
+const ADD_TODO = "ADD_TODO";
+const DELETE_TODO = "DELETE_TODO";
+
+const addToDo = (text) => {
+  return {
+    type: ADD_TODO,
+    text,
   }
-  return count;
+}
+
+const deleteToDo = (id) => {
+  return {
+    type: DELETE_TODO,
+    id,
+  }
+} 
+
+const reducer = (state = [], action) => {
+  switch (action.type) {
+    case ADD_TODO:
+      return [...state, { text: action.text, id: Date.now() }];
+    case DELETE_TODO:
+      return state.filter(toDo => toDo.id !== parseInt(action.id));
+    default:
+      return state;
+  }
 };
 
-const store = createStore(countModifier);
+const store = createStore(reducer);
 
-const onChange = () => {
-  number.innerHTML = store.getState();
+const dispatchAddTodo = (text) => {
+  store.dispatch(addToDo(text));
 }
 
-// #. 스토어에 변화가 일어났을 때 처리를 여기서 해준다.
-store.subscribe(onChange);
+const dispatchDeleteToDo = (e) => {
+  const id = parseInt(e.target.parentNode.id);
+  store.dispatch(deleteToDo(id));
 
-const handleAdd = () => {
-  store.dispatch({ type: "ADD" })
 }
 
-const handleMinus = () => {
-  store.dispatch({ type: "MINUS" });
+const paintToDos = () => {
+  const toDos = store.getState();
+  ul.innerText = "";
+  toDos.forEach(toDo => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.innerText = "DEL";
+    btn.addEventListener("click", dispatchDeleteToDo);
+    li.id = toDo.id;
+    li.innerText = toDo.text;
+    li.appendChild(btn);
+    ul.appendChild(li);
+  })
 }
 
-// Store은 내 state를 저장하는 공간을 생성
-plus.addEventListener("click", handleAdd);
-minus.addEventListener("click", handleMinus);
+//store.subscribe(() => console.log("asdfasdf"));
+store.subscribe(paintToDos);
+
+const onSubmit = e => {
+  e.preventDefault();
+  const toDo = input.value;
+  input.value = "";
+  dispatchAddTodo(toDo);
+}
+
+form.addEventListener("submit", onSubmit);
