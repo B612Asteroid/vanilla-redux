@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 function Detail({ toDo }) {
-    
+
     return (
         <>
             <h1>{toDo?.text}</h1>

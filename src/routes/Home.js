@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { connect } from "react-redux";
 import ToDo from "../components/ToDo";
-import { actionCreators } from "../store";
+import { add } from "../store";
 
 
 function Home({ toDos, addToDo }) {
@@ -36,7 +36,7 @@ function mapStateToProps(state, ownProps) { // redux가 준 것 + router가 준 
 
 function mapDispatchToProps(dispatch) {
     return {
-        addToDo: text => dispatch(actionCreators.addToDo(text))
+        addToDo: text => dispatch(add(text))
     }
 }
 
